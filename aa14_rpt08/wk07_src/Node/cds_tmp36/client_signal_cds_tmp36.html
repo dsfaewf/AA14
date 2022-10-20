@@ -4,13 +4,19 @@
   <title>IoT example: Real time signal from Arduino</title> 
   
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js"></script> 
+  
+  <script src="gauge.min.js"></script>
+
   <style>body{padding:0;margin:30;background:#fff}</style>
 </head>
 
 <body>  <!-- style="width:100%;height:100%"> -->
 
-<h1 align="center"> IoT Signal from Arduino </h1>
-
+<h1 align="center">Real-time Temperature(ºC) and Luminosity(lux) from sensors </h1>
+<div align="center">
+  <canvas id=""gauge1></canvas>
+  <canvas id=""gauge2></canvas>
+</div>
 <h2 align="center"> Real-time Signals </h2>
 
 <hr>
@@ -23,6 +29,16 @@
 
   <script>
   /* JAVASCRIPT CODE GOES HERE */
+    var streamPlot = document.getElementById('myDiv');
+    var ctime = document.getElementById('time');
+
+    var tArray=[],
+        xTrack=[],
+        yTrack=[],
+        dtda=[],
+        preX=-1,
+        preY=-1,
+        initFlag=true;
     var ctime = document.getElementById('time');
     var cdata = document.getElementById('data');
     
@@ -30,6 +46,16 @@
     var socket = io.connect('http://localhost:3000'); // port = 3000  
     socket.on('connect', function () {
         socket.on('message', function (msg) {
+          if(msg[0]!=''&& initFlag){
+            dtda[0]=msg[0];
+            dtda[1]=parseFloat(msg[1]);
+            dtda[2]=parseInt(msg[2]);
+            init();
+            initFlag=false;
+          }
+          dtda[0]=msg[0];
+          dtda[1]=parseFloat(msg[1]);
+          dtda[2]=parseInt(msg[2]);
             // message on Socket (TCP server)
             // Check the console by F12 in Chrome browser
             console.log(msg[0]); // mdata[0] => dStr
@@ -42,7 +68,6 @@
             cdata.innerHTML = msg[1] + "," + msg[2]; // + "," + msg[3];
         });
     });    
-
   </script>
 </body>
 </html>
